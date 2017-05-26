@@ -1,7 +1,7 @@
 import React from 'react';
 import store from './redux/store.js'
 import { connect } from 'react-redux'
-
+import { withRouter } from 'react-router-dom'
 class CommentBox extends React.Component{
   constructor(){
     super()
@@ -10,8 +10,10 @@ class CommentBox extends React.Component{
   handleSubmit(e){
     e.preventDefault()
     const content = this.textInput.value.trim()
-    store.dispatch({type:'ADD_COMMENT', comment:content})
-    this.refs.commentForm.reset()
+    if(content){
+      store.dispatch({type:'ADD_COMMENT', comment:content, postId:this.props.match.params.id})
+      this.refs.commentForm.reset()
+    }
   }
 
   render(){
@@ -19,7 +21,7 @@ class CommentBox extends React.Component{
       <div className="down">
         <div className="comment-box">
           {
-            this.props.comments.map(item=><div className="comment" key={Math.random()}>{item}</div>)
+            this.props.comments[this.props.id].map(item=><div className="comment" key={Math.random()}>{item}</div>)
           }
           <form className="comment-form" onSubmit={this.handleSubmit} ref="commentForm">
             <input type="text" className="input" ref={value=>this.textInput=value} />
@@ -34,7 +36,7 @@ class CommentBox extends React.Component{
 
 const mapStateToProps = (state) => (
   {
-    comments:state
+    comments:state.comments
   }
 )
-export default connect(mapStateToProps)(CommentBox)
+export default withRouter(connect(mapStateToProps)(CommentBox))
